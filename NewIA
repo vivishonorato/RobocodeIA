@@ -1,0 +1,113 @@
+package NewIA;
+import robocode.*;
+import java.awt.Color;
+
+	// NewIA - a robot by Viviane
+	
+public class NewIA extends AdvancedRobot //o robo é do tipo AdvancedRobot
+{
+	/*Estrutura denominada run, apenas como fase inicial do nosso robot,
+	 para definir coisas básicas como a movimentação inicial e cores agregadas
+	 ao nosso robot*/
+	public void run (){ //primeira estrutura do nosso código a rodar, aqui iniciamos com a seleção de cores pro nosso robot
+		setColors(Color.magenta,Color.yellow,Color.white);
+		
+		/*movimentação do robot, tais como adiante e também para o robot
+		girar a direita 360 graus. Onde também irá buscar oponentes*/
+		while (true) { //enquanto while for verdadeiro, ele irá executar que o robo irá a 100 pixels a frente
+						// girando o cano a direita em 360 graus		
+			ahead (100);
+			turnGunRight (360);
+	}
+		}	
+	  /* onScannedRobot: O que fazer quando vê outro Robot?
+	  * O nosso Robot sempre irá atacar o outro Robot a partir do momento em que
+	  * exista a percepção que o outro Robot está perdendo energia, estando abaixo
+	  * do nível de energia do nosso Robot. Ou seja, caso esse Robot encontrado
+	  * não esteja com uma energia menor que a nossa energia, o nosso Robot não 
+	  * irá atrás desse Robot.*/
+	public void onScannedRobot(ScannedRobotEvent e) { //quando visualizamos algum outro robot, que no caso o chamamos
+														//de variavel "e"
+		if ((e.getEnergy()<80) && (getEnergy()>e.getEnergy())){ //getEnergy irá retornar o atual nível de energia do robot
+																//onde será analisado o nível de energia do meu robot e o adversario
+															
+			setAhead(e.getDistance()-100); //verifica a distancia em relação ao robot e vai adiante dele
+			setTurnRight(e.getBearing()); //ira girar o robo para a direita conforme for avaliado o angulo do
+										  //robo adversario
+	
+		double hiperapontar=getHeading()+e.getBearing(); //para podermos apontar, iremos utilizar a referencia de
+														//angulo em relaçao do robo a tela e o angulo do robo
+														//adversario em relaçao a mim
+		double apontar= ajusteangulo (hiperapontar-getGunHeading()); //em apontar trabalhamos com o ajuste de angulo
+																	//utilizando o hiperapontar subtraído da
+																	//posição que o cano esta apontando
+
+//Função para giro do cano
+		if (Math.abs (apontar)<=3) { //retornando o valor absoluto
+			turnGunRight (apontar); //giro do cano para a direita com o angulo de apontar
+		if (getGunHeat () ==0) //verifica a temperatura do cano
+			fire (1.5); //atira com intensidade 1.5
+		}
+		else //caso contrário
+			turnGunRight(apontar); //giro do cano para a direita com o angulo de apontar
+		if (apontar==0) //caso não tenha mais aonde apontar e atirar
+			scan(); //então é feita a verificação de busca de outros robos
+		}
+		else //caso contrario 
+		{
+			setTurnRight(e.getBearing()); //ira girar o robo para a direita conforme for avaliado o angulo do
+										//adversario
+			setAhead(e.getDistance()); //verifica a distancia em relação ao robot e vai adiante dele
+		double hiperapontar=getHeading()+e.getBearing(); //para podermos apontar, iremos utilizar a referencia de
+														//angulo em relaçao do robo a tela e o angulo do robo
+														//adversario em relaçao a mim
+		double apontar= ajusteangulo (hiperapontar-getGunHeading()); //em apontar trabalhamos com o ajuste de angulo
+																	//utilizando o hiperapontar subtraído da
+																	//posição que o cano esta apontando
+
+//Função para giro do cano
+	if (Math.abs(apontar)<=3) { //retornando o valor absoluto
+		turnGunRight(apontar); //giro do cano para a direita com o angulo de apontar
+	if (getGunHeat()==0) //verifica a temperatura do cano
+		fire (2.5); //atira com intensidade 2.5
+	}
+	else //caso contrario
+		turnGunRight (apontar); //gira o cano a direita
+
+	if (apontar==0) //caso não tenha mais aonde apontar e atirar
+		scan();  //então é feita a verificação de busca de outros robos
+	}
+}
+
+	/*Para ajustar angulo*/
+	public double ajusteangulo(double angulo){
+		if ((angulo>-180) && (angulo<=180)) //caso o angulo seja maior que menos 180 e maior/igual a 180
+											//entao ira ser retornada a variavel angulo, anguloF também irá
+											//ser equivalente a angulo
+		return (angulo);
+		double anguloF=angulo;
+
+		while (anguloF<=-180)		     	//enquanto o anguloF for menor igual a menos 180 
+											//entao ira ser adicionado 360graus a anguloF
+			anguloF+=360;
+		while (anguloF > 180)				//enquanto o anguloF for maior que 180 
+											//entao ira ser subtraído 360graus a anguloF
+											//após os processos será retornado o anguloF
+			anguloF-=360;
+		return(anguloF);
+}
+	/*onHitByBullet: O que eu faço quando sou atingido? Volto 40 pixels para tentar
+	  me proteger. */
+	//public void onHitByBullet(HitByBulletEvent e) {
+	//	back(20);
+		//}
+
+	/*onHitWall:Quando hito a parede me movo em circulos e volto 10 pixels para tentar
+	sair da situação*/
+	public void onHitWall(HitWallEvent e) {
+		setAhead(100); //adiante 100 pixels
+		setTurnRight(360); //gira o body do robot em 360 graus
+		execute(); //executa a ação através do AdvencedRobot
+		back(10); //irá para "trás" em 10 pixels
+	}
+} //finish
